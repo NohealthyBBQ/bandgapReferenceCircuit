@@ -136,7 +136,7 @@ lab=GND}
 N 1640 -20 2190 -20 {
 lab=GND}
 N 2190 -400 2190 -380 {
-lab=#net7}
+lab=vd4}
 N 2190 -320 2190 -290 {
 lab=vfeedback}
 N 2130 -180 2170 -180 {
@@ -148,7 +148,7 @@ lab=GND}
 N 1640 -410 1870 -410 {
 lab=vbg}
 N 2190 -450 2190 -400 {
-lab=#net7}
+lab=vd4}
 N 2130 -480 2130 -430 {
 lab=vcurrent_gate}
 N 2130 -480 2150 -480 {
@@ -156,9 +156,9 @@ lab=vcurrent_gate}
 N 2190 -680 2190 -510 {
 lab=VDD}
 N 2370 -400 2370 -380 {
-lab=#net8}
+lab=vd5}
 N 2370 -450 2370 -400 {
-lab=#net8}
+lab=vd5}
 N 2310 -480 2310 -430 {
 lab=vcurrent_gate}
 N 2310 -480 2330 -480 {
@@ -174,13 +174,7 @@ lab=GND}
 N 2190 -20 2370 -20 {
 lab=GND}
 N 2370 -130 2370 -100 {
-lab=#net9}
-N 2410 -160 2470 -160 {
-lab=#net10}
-N 2470 -210 2470 -160 {
-lab=#net10}
-N 2320 -160 2370 -160 {
-lab=GND}
+lab=#net7}
 N 2320 -160 2320 -20 {
 lab=GND}
 N 2320 -70 2370 -70 {
@@ -198,19 +192,9 @@ lab=VDD}
 N 2370 -530 2430 -530 {
 lab=VDD}
 N 2370 -320 2370 -290 {
-lab=#net10}
-N 2370 -230 2370 -190 {
-lab=#net11}
-N 2470 -300 2470 -210 {
-lab=#net10}
-N 2370 -300 2470 -300 {
-lab=#net10}
+lab=#net7}
 N 2410 -70 2450 -70 {
-lab=#net11}
-N 2450 -210 2450 -70 {
-lab=#net11}
-N 2370 -210 2450 -210 {
-lab=#net11}
+lab=#net7}
 N 2320 -260 2350 -260 {
 lab=GND}
 N 2320 -260 2320 -160 {
@@ -241,6 +225,20 @@ N 980 -440 1000 -440 {
 lab=VDD}
 N 1000 -470 1000 -440 {
 lab=VDD}
+N 2450 -110 2450 -70 {
+lab=#net7}
+N 2370 -110 2450 -110 {
+lab=#net7}
+N 2370 -290 2370 -230 {
+lab=#net7}
+N 2370 -230 2370 -130 {
+lab=#net7}
+N 1390 -510 1420 -510 {
+lab=GND}
+N 1390 -510 1390 -410 {
+lab=GND}
+N 1390 -410 1460 -410 {
+lab=GND}
 C {devices/vsource.sym} 2730 -670 0 0 {name=V1 net_name=true value="'VDD' pwl 0us 0 5us 'VDD'"}
 C {devices/vdd.sym} 2730 -700 0 0 {name=l8 lab=VDD}
 C {devices/gnd.sym} 2730 -640 0 0 {name=l9 lab=GND}
@@ -511,8 +509,14 @@ let iout = vm3#branch
 let iref = vm4#branch
 let iref_final = vm5#branch
 plot iout iref iref_final
+plot iref iref_final
 plot deriv(iout) deriv(iref) deriv(iref_final)
+plot vcurrent_gate vd5 vd4
 save vbg deriv(vbg)
+let i_left = vm1#branch
+let i_right = vm2#branch
+plot i_left i_right
+plot va vb
 let i = vm3#branch
 let indx27 = 3700
 let indx0 = 1000
@@ -592,7 +596,6 @@ sa=0 sb=0 sd=0
 model=nfet_01v8_lvt
 spiceprefix=X
 }
-C {devices/lab_pin.sym} 1420 -510 0 0 {name=l15 lab=porst}
 C {devices/vsource.sym} 2730 -540 0 0 {name=V2 net_name=true value="0 pulse(0V 1.8V 10us 0us 0us 5us)"}
 C {devices/gnd.sym} 2730 -510 0 0 {name=l16 lab=GND}
 C {devices/lab_pin.sym} 2730 -570 0 0 {name=l19 lab=porst}
@@ -698,7 +701,7 @@ only_toplevel=true
 format="tcleval( @value )"
 value="
 ** opencircuitdesign pdks install
-.lib $::SKYWATER_MODELS/sky130.lib.spice tt_mm
+.lib $::SKYWATER_MODELS/sky130.lib.spice tt
 
 "
 spice_ignore=false}
@@ -736,25 +739,11 @@ model=pfet_01v8_lvt
 spiceprefix=X
 }
 C {devices/ammeter.sym} 2370 -350 0 0 {name=Vm5 current=1.0239e-05}
-C {sky130_fd_pr/nfet_01v8_lvt.sym} 2390 -160 0 1 {name=M14
+C {sky130_fd_pr/nfet_01v8_lvt.sym} 2390 -70 0 1 {name=M4
 L=2
-W=1
+W=8
 nf=1
-mult=3.65
-ad="'int((nf+1)/2) * W/nf * 0.29'" 
-pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
-as="'int((nf+2)/2) * W/nf * 0.29'" 
-ps="'2*int((nf+2)/2) * (W/nf + 0.29)'"
-nrd="'0.29 / W'" nrs="'0.29 / W'"
-sa=0 sb=0 sd=0
-model=nfet_01v8_lvt
-spiceprefix=X
-}
-C {sky130_fd_pr/nfet_01v8_lvt.sym} 2390 -70 0 1 {name=M15
-L=2
-W=1
-nf=1
-mult=3.65
+mult=10
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -765,15 +754,12 @@ model=nfet_01v8_lvt
 spiceprefix=X
 }
 C {res.sym} 2190 -180 0 0 {name=R5
-value=41.8k
-footprint=1206
-device=resistor
-m=1}
-C {res.sym} 2370 -260 0 0 {name=R6
-value=41.8k
+value=42k
 footprint=1206
 device=resistor
 m=1}
 C {design/opamp/opamp.sym} 900 -470 1 1 {name=x2}
 C {devices/gnd.sym} 780 -470 0 0 {name=l2 lab=GND}
 C {devices/lab_wire.sym} 1020 -470 0 1 {name=l14 lab=VDD}
+C {devices/lab_pin.sym} 2370 -420 0 1 {name=l24 lab=vd5}
+C {devices/lab_pin.sym} 2190 -410 0 1 {name=l25 lab=vd4}
