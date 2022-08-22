@@ -59,7 +59,7 @@ plot dc1.Vbg dc2.Vbg dc3.Vbg dc4.Vbg dc5.Vbg dc6.Vbg dc7.Vbg dc8.Vbg dc9.Vbg dc1
 *plot -I(VDD)
 *.endc
 "}
-C {devices/code_shown.sym} 1290 -1100 0 0 {name=NGSPICE1
+C {devices/code_shown.sym} 830 -1130 0 0 {name=NGSPICE1
 only_toplevel=true
 spice_ignore=false
 value="
@@ -74,7 +74,7 @@ value="
 .param R4val='R2val*R4R2ratio'
 .nodeset v(vgate)=1.3
 .option temp=0
-.dc temp -20 100 1
+.dc temp -40 100 1
 .control
 save all
 *+ @m.xm13.msky130_fd_pr__pfet_01v8_lvt[gm]
@@ -88,13 +88,20 @@ save all
 run
 plot Vbg
 plot deriv(Vbg)
+plot vota_bias
+let i_bias = vmbias#branch
+plot i_bias
 *plot vbg vfeedback vcurrent_gate
 let i_left = vm1#branch
 let i_right = vm2#branch
 let i_3 = vm3#branch
 plot i_left i_right i_3
+plot i_3
+plot deriv(i_3)
 plot va vb vbe3 vgate
 plot Veb vbneg
+plot vbe3
+plot deriv(vbe3)
 let iout = vm3#branch
 let iref = vm4#branch
 let iref_final = vm5#branch
@@ -168,3 +175,258 @@ unset askquit
 *quit
 .endc
 " }
+C {sky130_fd_pr/res_high_po.sym} -180 -270 0 0 {name=R4
+W=2
+L=46
+model=res_high_po
+spiceprefix=X
+mult=1}
+C {code.sym} 10 310 0 0 {name=commands_param_sweep only_toplevel=false value="
+.options savecurrents
+
+*** plot temperature coefficient
+*Vdd VDD GND 3.3
+*V_en en GND 3.3
+*.dc temp -40 140 1
+.control
+*run
+*dc temp -40 100 1
+*plot Vout
+
+save all
+set appendwrite
+compose width_vector  values 1.25 2
+compose length_vector values 0.15 1
+
+let i = 0 
+while i < length(width_vector)
+    reset
+    echo 'assigning vectors'
+    alter @m.xm1.msky130_fd_pr__nfet_01v8[L] = length_vector[i]
+    echo 'Still assigning vectors'
+    alter @m.xm1.msky130_fd_pr__nfet_01v8[W] = width_vector[i]
+    echo 'done assigning'
+    dc temp -40 100 1
+    plot Vout
+    
+    let i = i + 1 
+end
+
+
+.endc
+
+
+
+*** plot voltage coefficient
+*Vdd VDD GND 3.3
+*V_en en GND 3.3
+*.dc Vdd 2 4 0.1
+*.control
+*run
+*plot deriv(V(Vbgp))
+*.endc
+
+*** plot temperature coefficient
+*Vdd VDD GND 3.3
+*V_en en GND 3.3
+*.dc temp -40 140 1
+*.control
+*run
+*plot deriv(V(Vbgp))/1.202344
+*.endc
+
+
+
+*** enable pin
+*Vdd VDD GND 3.3
+*V_en en GND PULSE(0 3.3 0 200us 200us 600us 2000us 0)
+*.tran 1u 2000us
+*.control
+*run
+*plot V(en)
+*plot -I(VDD)
+*.endc
+"}
+C {code.sym} 300 120 0 0 {name=commands_plain_temp_sweep only_toplevel=false value="
+.options savecurrents
+
+*** plot temperature coefficient
+*Vdd VDD GND 3.3
+*V_en en GND 3.3
+*.dc temp -40 140 1
+.control
+save all
+run
+dc temp -40 100 1
+plot Vbg
+
+
+
+
+.endc
+
+
+
+*** plot voltage coefficient
+*Vdd VDD GND 3.3
+*V_en en GND 3.3
+*.dc Vdd 2 4 0.1
+*.control
+*run
+*plot deriv(V(Vbgp))
+*.endc
+
+*** plot temperature coefficient
+*Vdd VDD GND 3.3
+*V_en en GND 3.3
+*.dc temp -40 140 1
+*.control
+*run
+*plot deriv(V(Vbgp))/1.202344
+*.endc
+
+
+
+*** enable pin
+*Vdd VDD GND 3.3
+*V_en en GND PULSE(0 3.3 0 200us 200us 600us 2000us 0)
+*.tran 1u 2000us
+*.control
+*run
+*plot V(en)
+*plot -I(VDD)
+*.endc
+"}
+C {devices/code_shown.sym} -740 -310 0 0 {name=NGSPICE2
+only_toplevel=true
+spice_ignore=false
+value="
+.option savecurrents
+.option warn=1
+.nodeset v(vgate)=1.3
+.option temp=0
+.dc temp -20 100 1
+.control
+save all
+
+run
+plot Vbg
+plot deriv(Vbg)
+
+let i_left = vm1#branch
+let i_right = vm2#branch
+let i_3 = vm3#branch
+
+let iout = vm3#branch
+let iref = vm4#branch
+let iref_final = vm5#branch
+
+plot iref iref_final
+plot deriv(iref) deriv(iref_final)
+
+save vbg deriv(vbg)
+
+
+
+
+unset askquit
+*quit
+.endc
+" }
+C {devices/code_shown.sym} -1120 210 0 0 {name=NGSPICE4
+only_toplevel=true
+spice_ignore=false
+value="
+.option savecurrents
+.option warn=1
+.nodeset v(vgate)=1.3
+.option temp=0
+.dc temp -20 100 1
+.control
+save all
+
+run
+plot Vbg
+plot deriv(Vbg)
+plot Vota_bias1
+
+let i_left = vm1#branch
+let i_right = vm2#branch
+let i_3 = vm3#branch
+
+let iout = vm3#branch
+let iref = vm4#branch
+let iref_final = vm5#branch
+
+plot iref iref_final
+plot deriv(iref) deriv(iref_final)
+
+save vbg deriv(vbg)
+
+
+
+
+unset askquit
+*quit
+.endc
+" }
+C {devices/code_shown.sym} -1520 190 0 0 {name=NGSPICE3
+only_toplevel=true
+spice_ignore=false
+value="
+.option savecurrents
+.option warn=1
+.nodeset v(vgate)=1.3
+.option temp=0
+.dc temp -20 100 1
+.control
+save all
+
+run
+plot Vbg
+plot deriv(Vbg)
+plot Vota_bias1
+plot vd4 vd5 vcurrent_gate
+
+let i_left = vm1#branch
+let i_right = vm2#branch
+let i_3 = vm3#branch
+
+let iout = vm3#branch
+let iref = vm4#branch
+let iref_final = vm5#branch
+
+plot iref iref_final
+plot deriv(iref) deriv(iref_final)
+
+save vbg deriv(vbg)
+
+
+
+
+unset askquit
+*quit
+.endc
+" }
+C {devices/code_shown.sym} -270 -50 0 0 {name=s2 
+only_toplevel=true 
+spice_ignore=false
+
+value="
+.option savecurrents
+
+.param VDD=1.8
+.control
+save all
+
+run
+option temp=27
+tran 0.1n 20u
+plot VDD Vbg porst
+plot porst_buff
+plot vm5#branch
+
+unset askquit
+
+.endc
+"}
