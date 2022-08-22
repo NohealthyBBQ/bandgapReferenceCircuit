@@ -71,8 +71,6 @@ N -1270 -670 -1230 -670 { lab=VDD}
 N -1260 -10 -1220 -10 { lab=GND}
 N -1170 -580 -1010 -580 { lab=vgate}
 N -1310 -580 -1170 -580 { lab=vgate}
-N -270 -670 -270 -650 { lab=VDD}
-N -270 -590 -270 -580 { lab=vgate}
 N 0 -670 300 -670 {
 lab=VDD}
 N -720 -330 -620 -330 {
@@ -134,7 +132,6 @@ lab=VDD}
 N -220 -390 -220 -10 {
 lab=GND}
 N -220 -420 -210 -420 { lab=GND}
-N -220 -390 -210 -420 { lab=GND}
 N 410 -670 440 -670 {
 lab=VDD}
 N 440 -670 440 -500 {
@@ -288,7 +285,7 @@ lab=porst}
 N -350 140 -350 170 {
 lab=VDD}
 N -210 230 -210 270 {
-lab=porst_buff}
+lab=#net9}
 N -210 140 -210 170 {
 lab=VDD}
 N -260 300 -250 300 {
@@ -302,11 +299,11 @@ lab=#net8}
 N -350 140 -210 140 {
 lab=VDD}
 N -350 330 -350 350 {
-lab=#net9}
+lab=GND}
 N -350 350 -210 350 {
-lab=#net9}
+lab=GND}
 N -210 330 -210 350 {
-lab=#net9}
+lab=GND}
 N -350 200 -330 200 {
 lab=VDD}
 N -330 170 -330 200 {
@@ -320,17 +317,33 @@ lab=VDD}
 N -210 170 -190 170 {
 lab=VDD}
 N -350 300 -330 300 {
-lab=#net9}
+lab=GND}
 N -330 300 -330 330 {
-lab=#net9}
+lab=GND}
 N -350 330 -330 330 {
-lab=#net9}
+lab=GND}
 N -210 300 -190 300 {
-lab=#net9}
+lab=GND}
 N -190 300 -190 330 {
-lab=#net9}
+lab=GND}
 N -210 330 -190 330 {
+lab=GND}
+N -210 -420 -200 -420 {
+lab=GND}
+N -200 -420 -200 -390 {
+lab=GND}
+N -220 -390 -200 -390 {
+lab=GND}
+N -20 250 -20 290 {
+lab=porst_buff}
+N -40 250 -20 250 {
+lab=porst_buff}
+N -100 240 -100 250 {
 lab=#net9}
+N -210 240 -100 240 {
+lab=#net9}
+N -20 350 -20 380 {
+lab=GND}
 C {devices/code.sym} 1140 -520 0 0 {name=TT_MODELS
 only_toplevel=true
 format="tcleval( @value )"
@@ -479,10 +492,10 @@ C {devices/gnd.sym} 1440 -250 0 0 {name=l12 lab=GND}
 C {devices/lab_pin.sym} 1440 -310 0 0 {name=l23 lab=porst}
 C {design/opamp/opamp_realcomp2.sym} -740 -460 1 1 {name=x1}
 C {sky130_fd_pr/nfet_01v8_lvt.sym} -240 -420 0 0 {name=M10
-L='2'
-W='1'
+L=0.15
+W=1
 nf=1
-mult=34
+mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
 pd="'2*int((nf+1)/2) * (W/nf + 0.29)'"
 as="'int((nf+2)/2) * W/nf * 0.29'" 
@@ -593,6 +606,7 @@ option temp=27
 tran 0.1n 20u
 plot VDD Vbg porst
 plot porst_buff
+plot vm5#branch
 
 unset askquit
 
@@ -600,7 +614,7 @@ unset askquit
 "}
 C {sky130_fd_pr/nfet_01v8.sym} -370 300 0 0 {name=M6
 L=0.15
-W=0.5
+W=1
 nf=1 
 mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
@@ -614,7 +628,7 @@ spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8.sym} -370 200 0 0 {name=M9
 L=0.15
-W=1
+W=2
 nf=1
 mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
@@ -628,7 +642,7 @@ spiceprefix=X
 }
 C {sky130_fd_pr/nfet_01v8.sym} -230 300 0 0 {name=M12
 L=0.15
-W=0.5
+W=1
 nf=1 
 mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
@@ -642,7 +656,7 @@ spiceprefix=X
 }
 C {sky130_fd_pr/pfet_01v8.sym} -230 200 0 0 {name=M14
 L=0.15
-W=1
+W=2
 nf=1
 mult=1
 ad="'int((nf+1)/2) * W/nf * 0.29'" 
@@ -656,4 +670,16 @@ spiceprefix=X
 }
 C {lab_wire.sym} -350 140 0 0 {name=l28 sig_type=std_logic lab=VDD}
 C {devices/lab_pin.sym} -430 230 0 0 {name=l30 lab=porst}
-C {devices/lab_pin.sym} -210 250 0 1 {name=l31 lab=porst_buff}
+C {devices/lab_pin.sym} -20 250 0 1 {name=l31 lab=porst_buff}
+C {devices/gnd.sym} -260 350 0 0 {name=l32 lab=GND}
+C {capa.sym} -20 320 0 0 {name=C1
+m=1
+value=500f
+footprint=1206
+device="ceramic capacitor"}
+C {devices/gnd.sym} -20 380 0 0 {name=l33 lab=GND}
+C {res.sym} -70 250 1 0 {name=R5
+value=5k
+footprint=1206
+device=resistor
+m=1}
